@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Lutterzand</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main_map">mainMapActivity</string>
+    <string name="gisdataurl">http://www.woutermarra.nl/maps/</string>
+    <string name="filename">ahn2_export-pyr.tif</string>
+
+
+</resources>
