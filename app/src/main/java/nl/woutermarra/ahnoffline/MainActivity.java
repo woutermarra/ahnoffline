@@ -1,6 +1,5 @@
-package nl.woutermarra.fieldworkmapsfrance;
+package nl.woutermarra.ahnoffline;
 
-import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 
@@ -10,19 +9,13 @@ import com.esri.core.geometry.GeometryEngine;
 import com.esri.core.geometry.Point;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 import com.esri.android.map.MapView;
 import com.esri.android.map.RasterLayer;
@@ -30,8 +23,6 @@ import com.esri.core.geometry.SpatialReference;
 import com.esri.core.map.Graphic;
 import com.esri.core.raster.FileRasterSource;
 import com.esri.core.renderer.BlendRenderer;
-import com.esri.core.renderer.Colormap;
-import com.esri.core.renderer.ColormapRenderer;
 import com.esri.core.renderer.HillshadeRenderer;
 import com.esri.core.renderer.StretchParameters;
 import com.esri.core.renderer.StretchRenderer;
@@ -39,10 +30,6 @@ import com.esri.core.symbol.PictureMarkerSymbol;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     MapView mMapView;
@@ -76,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
             StretchParameters stretchParams = new StretchParameters.MinMaxStretchParameters();
             StretchRenderer renderer = new StretchRenderer();
             renderer.setStretchParameters(stretchParams);
-
             HillshadeRenderer renderer2 = new HillshadeRenderer();
+            //BlendRenderer renderer3 = new BlendRenderer();
             rasterLayer.setRenderer(renderer2);
 
             mMapView.addLayer(rasterLayer);
@@ -86,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (FileNotFoundException fe) {
             Log.d(TAG, "raster file doesn't exist");
         } catch (RuntimeException re) {
-            Log.d(TAG, "raster file can't be opened");
+            Log.d(TAG, "raster file can't be opened" + re);
         }
 
         // start location manager
@@ -203,13 +190,17 @@ public class MainActivity extends AppCompatActivity {
 
             // Location to store
             File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File root = new File(downloadDir.getAbsolutePath() + "/GisData/");
+            File root = new File(downloadDir.getAbsolutePath(), "GisData");
             String subfolder = "/Gisdata/";
             File newFile = new File(root, fileName);
 
+            Log.d("Downloader", "newFile: " + newFile.toString());
+
             // check if file exists
             if(newFile.exists()) {
-                Log.d("Downloader", "Skip downloading, file already exists: " + newFile.getPath());
+                Log.d("Downloader", "Skip downloading, file already exists: " + newFile.toString());
+                Log.d("Downloader", "Skip downloading, file already exists: (get) " + newFile.getAbsolutePath());
+
                 return newFile.getPath();
             }
 
@@ -218,11 +209,12 @@ public class MainActivity extends AppCompatActivity {
 
             // use download manager to download file
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(fileURL));
-            request.setDescription("Some descrition");
-            request.setTitle("Some title");
+            request.setDescription("Downloading gisdata");
+            request.setTitle(newFile.toString());
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, subfolder + fileName);
-
             DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+
+//            Log.d("Downloader", "newFileUriPath" + newFileUri.getPath());
 
             Log.d("Downloader", DownloadManager.COLUMN_LOCAL_FILENAME);
             manager.enqueue(request);
